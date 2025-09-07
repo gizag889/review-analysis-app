@@ -1,50 +1,43 @@
 import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-    CardDescription,
-  } from "@/components/ui/card";
-  import { Badge } from "@/components/ui/badge";
-  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-  import { ThumbsUp, ThumbsDown, Pen } from "lucide-react";
-  import { mockAISummary as AISummary, mockReviews } from "@/constants/data";
-  import StarRating from "./StarRating";
-
-  /**
- * 平均評価を計算する関数 Jsdoc野コメントたちです
- * @param reviews - レビューの配列
- * 
- * @returns 平均評価（小数点以下1桁まで）
- */
-const calculateAverageRating = (reviews: { rating: number }[]): number => {
-    if (reviews.length === 0) return 0;
-   
-    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-    const average = totalRating / reviews.length;
-   
-    return Math.round(average * 10) / 10;
-  };
-   
-  const AISummaryCard = () => {
-    const averageRating = calculateAverageRating(mockReviews);
-   
-    return (
-      <Card className="bg-gradient-to-br border-indigo-300 from-white to-indigo-50">
-        <CardHeader className="text-center">
-          <CardTitle className="text-lg">AIによるレビュー分析</CardTitle>
-          <CardDescription className="text-xs">
-            全レビューの総合的な洞察
-          </CardDescription>
-          <div className="flex items-center justify-center py-4">
-            <span className="text-4xl font-bold mr-4">{averageRating}</span>
-            <StarRating rating={Math.round(averageRating)} />
-          </div>
-        </CardHeader>
-   
-
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ThumbsUp, ThumbsDown, Pen } from "lucide-react";
+// モックデータは削除 or コメントアウト
+// import { mockAISummary as AISummary } from "@/constants/data";
+import StarRating from "./StarRating";
  
-   
+import { Button } from "./ui/button";
+import useAISummaryLogic from "@/hooks/useAISummaryLogic";
+ 
+const AISummaryCard = () => {
+  // カスタムフックの呼び出し
+  const { averageRating, handleClick, AISummary } = useAISummaryLogic();
+ 
+  return (
+    <Card className="bg-gradient-to-br border-indigo-300 from-white to-indigo-50">
+      <CardHeader className="text-center">
+        <CardTitle className="text-lg">AIによるレビュー分析</CardTitle>
+        <CardDescription className="text-xs">
+          全レビューの総合的な洞察
+        </CardDescription>
+        <div className="flex items-center justify-center py-4">
+          <span className="text-4xl font-bold mr-4">{averageRating}</span>
+          <StarRating rating={Math.round(averageRating)} />
+        </div>
+      </CardHeader>
+ 
+      {/* AI からの res があるかどうかで条件分岐 */}
+      {AISummary === null ? (
+        <CardContent className="flex justify-center">
+          <Button onClick={handleClick}>Generate</Button>
+        </CardContent>
+      ) : (
         <CardContent>
           <Tabs defaultValue="summary" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
@@ -80,8 +73,9 @@ const calculateAverageRating = (reviews: { rating: number }[]): number => {
             </TabsContent>
           </Tabs>
         </CardContent>
-      </Card>
-    );
-  };
-   
-  export default AISummaryCard;
+      )}
+    </Card>
+  );
+};
+ 
+export default AISummaryCard;
